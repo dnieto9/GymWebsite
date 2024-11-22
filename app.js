@@ -1,21 +1,29 @@
-const bodyParser = require("body-parser");
-const express = require("express");
+const express = require('express');
+const bodyParser = require('body-parser');
 const app = express();
+const path = require('path');
 const port = 8000;
 
 app.use(express.static(__dirname));
+app.use(bodyParser.urlencoded({ extended: false }));
 
-app.get("/SignUp",(req,res) => {
-    res.sendFile(__dirname + "/pages/form.html");
+// Serve Admin Login Page
+app.get("/admin_login", (req, res) => {
+    res.sendFile(path.join(__dirname, '/pages/admin_login.ejs'));
 });
 
-app.use(bodyParser.urlencoded({extended:false}))
-app.get('/submit',function(req,res){
-    console.log('Data Saved')
+// Handle Admin Login POST request
+app.post("/admin_login", (req, res) => {
+    const { username, password } = req.body;
 
-})
-
-app.listen(port, () =>{
-    console.log(`Example app listening on port ${port}!`);
+    // Simple admin login validation
+    if (username === "admin" && password === "admin123") {
+        res.send("Welcome, Admin!");
+    } else {
+        res.send("Invalid credentials, please try again.");
+    }
 });
 
+app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
+});

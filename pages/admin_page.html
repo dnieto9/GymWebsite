@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Page</title>
+    <style>
+        /* General Styles */
+        body {
+            background-color: #ffebf1;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            color: #ff4081;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #ff4081;
+            font-size: 2em;
+            margin-bottom: 30px;
+        }
+
+        /* Search Form Styling */
+        .search-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        input[type="text"] {
+            padding: 12px;
+            width: 280px;
+            margin-right: 10px;
+            border: 2px solid #ff4081;
+            border-radius: 15px;
+            font-size: 1.2em;
+            background-color: #fff0f6;
+            color: #ff4081;
+        }
+
+        button {
+            padding: 12px 25px;
+            background-color: #ff4081;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #ff80ab;
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            margin-top: 40px;
+            border-collapse: collapse;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border: 1px solid #ff4081;
+        }
+
+        th {
+            background-color: #ff4081;
+            color: white;
+            font-size: 1.1em;
+        }
+
+        td {
+            background-color: #fff0f6;
+            color: #ff4081;
+            font-size: 1em;
+        }
+
+        tr:nth-child(even) {
+            background-color: #fce4ec;
+        }
+
+        tr:hover {
+            background-color: #ffebf1;
+        }
+
+        /* No Results Message */
+        .no-results {
+            text-align: center;
+            font-size: 1.2em;
+            color: #ff80ab;
+            margin-top: 20px;
+        }
+
+        /* Container for Results */
+        .results-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to the Admin Page!</h1>
+
+    <!-- Search Section -->
+    <div class="search-container">
+        <form action="/search" method="GET">
+            <input type="text" name="q" value="<%= searchTerm %>" placeholder="Search members by name or ID" required>
+            <button type="submit">Search</button>
+        </form>
+    </div>
+
+    <!-- Results Section -->
+    <div class="results-container">
+        <% if (members && members.length > 0) { %>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Membership ID</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email</th>
+                        <th>Phone Number</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% members.forEach(member => { %>
+                        <tr>
+                            <td><%= member.membership_id %></td>
+                            <td><%= member.first_name %></td>
+                            <td><%= member.last_name %></td>
+                            <td><%= member.email %></td>
+                            <td><%= member.phone_number %></td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        <% } else { %>
+            <p class="no-results">No members found matching your search. Try again with different keywords!</p>
+        <% } %>
+    </div>
+</body>
+</html>

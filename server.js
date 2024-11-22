@@ -1,13 +1,17 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const pool = require("./database");
+const path = require("path");
 
 const app = express();
 const port = 9000;
 
-// Middleware
-app.use(express.static(__dirname));
+// Middleware to serve static files (like images and CSS)
+app.use(express.static(path.join(__dirname, 'public')));  // Serve static assets from the 'public' folder
 app.use(bodyParser.urlencoded({ extended: false }));
+
+// Set EJS as the template engine (if you're still using it for other pages)
+app.set("view engine", "ejs");
 
 // Serve the form
 app.get("/", (req, res) => {
@@ -24,58 +28,40 @@ app.get("/signup", (req, res) => {
     res.sendFile(__dirname + "/pages/form.html");
 });
 
-// Handle form submission
-app.post("/", async (req, res) => {
-    const {
-        membership_id,
-        first_name,
-        last_name,
-        gender,
-        dob,
-        join_date,
-        payment_status, // This is coming as "paid" or "unpaid"
-        email,
-        phone_number,
-        street,
-        city,
-        state,
-        zip,
-    } = req.body;
+// Serve the Admin Login Page
+app.get("/admin_login", (req, res) => {
+    res.sendFile(path.join(__dirname, "pages/admin_login.html"));
+});
 
-    // Convert payment status to boolean
-    const paymentStatus = payment_status.toLowerCase() === 'paid' ? true : false;
+// Handle the Admin Login POST request
+app.post("/admin_login", (req, res) => {
+    // Redirect to the admin page without validation for now
+    res.redirect("/admin_page");
+});
 
+// Serve the Admin Page
+app.get("/admin_page", (req, res) => {
+    res.sendFile(path.join(__dirname, "pages/admin_page.html"));
+});
+
+// Search for members in the database
+app.get("/search", async (req, res) => {
+    const searchTerm = req.query.q || "";  // Get the search query
     try {
         const query = `
-            INSERT INTO public.member 
-            (membership_id, first_name, last_name, gender, dob, join_date, payment_status, email, phone_number, street, city, state, zip)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-            RETURNING *;
+            SELECT * FROM public.member 
+            WHERE first_name ILIKE $1 
+            OR last_name ILIKE $1
+            OR membership_id::text ILIKE $1;
         `;
-
-        const values = [
-            membership_id,
-            first_name,
-            last_name,
-            gender,
-            dob,
-            join_date,
-            paymentStatus, // Now it's true or false
-            email,
-            phone_number,
-            street,
-            city,
-            state,
-            zip,
-        ];
-
+        const values = [`%${searchTerm}%`];
         const result = await pool.query(query, values);
-        console.log("Data Inserted:", result.rows);
+        const members = result.rows;
 
-        res.status(200).send("Form submitted successfully!");
+        res.render("admin_page", { members, searchTerm });
     } catch (err) {
-        console.error("Error inserting data:", err.stack);
-        res.status(500).send("Error saving data.");
+        console.error("Error searching members:", err.stack);
+        res.status(500).send("Error searching members.");
     }
 });
 

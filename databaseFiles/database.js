@@ -13,7 +13,7 @@ client.connect((err => {
 
 
 function userExists(email, callback){
-    let sql = "SELECT * FROM form WHERE mail = $1";
+    let sql = "SELECT * FROM member WHERE email = $1";
     client.query(sql, [email],(err,results) => {
         if(err){
             return callback(err);
@@ -23,6 +23,34 @@ function userExists(email, callback){
     });
 }
 
+function passwordCheck(email,password, callback){
+    let sql = "SELECT * FROM member WHERE email = $1 and password = $2";
+    client.query(sql, [email,password], (err,results) =>{
+        if(err){
+            console.log('database.js');
+            return callback(err);
+        }
+        callback(null, results.rows.length>0);
+    });
+}
+function getUserByEmail(email, callback) {
+    let sql = "SELECT * FROM member WHERE email = $1";
+    client.query(sql, [email], (err, results) => {
+        if (err) {
+            console.log('Error in getUserByEmail:', err);
+            return callback(err); // Return error in the callback
+        }
+
+        if (results.rows.length > 0) {
+            // Return the user data (all columns) if found
+            return callback(null, results.rows[0]);  // Assuming you want the first result
+        } else {
+            return callback(null, null); // If no user is found
+        }
+    });
+}
+
+
 
 
 //functions that need direct access to database go here for example
@@ -31,6 +59,6 @@ function userExists(email, callback){
 //insert user --> insert a new user into the database
 //etc...
 
-module.exports = {userExists,
+module.exports = {userExists,passwordCheck,getUserByEmail,
     databaseConnection : client
 };

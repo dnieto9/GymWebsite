@@ -3,6 +3,7 @@ var router = express.Router();
 var {memberLogin} = require('./databaseFiles/login');
 var {handleSignup} = require('./databaseFiles/signup'); 
 var{getUserByEmail} = require('./databaseFiles/database');
+var {getMembershipId,getCurrentGymId,getGymInfo,getLastPayment} = require('./databaseFiles/userFunctions');
 
 var connection = require('./databaseFiles/database').databaseConnection;
 var fs = require("fs");
@@ -87,7 +88,7 @@ router.get("/search", async (req, res) => {
     }
 });
 
-router.get('/payhistory', (req, res) => {
+router.get('/payhistory', async (req, res) => {
     console.log('session on /payhistory: ', req.session);
 
     if (!req.session.user) {
@@ -97,22 +98,51 @@ router.get('/payhistory', (req, res) => {
 
     const email = req.session.user.email;
 
-    // Fetch user details from the database
-    getUserByEmail(email, (err, user) => {
-        if (err) {
-            console.log('Error fetching user data:', err);
-            return res.status(500).send('Error fetching user details');
-        }
-
+    try {
+        // Fetch user details
+        const user = await getUserByEmail(email);
         if (!user) {
             console.log('User not found');
             return res.redirect('/login');
         }
 
-        // Now `user` contains all the columns for the user, pass it to the view
-        res.render('payhistory', { user: user });
-    });
+        // Get the membership ID
+        const membership = await getMembershipId(email);
+        if (!membership) {
+            console.log('Membership not found for user');
+            return res.redirect('/login');
+        }
+
+        // Get the current gym ID based on the last check-in
+        const currentGymId = await getCurrentGymId(membership.membership_id);
+        if (!currentGymId) {
+            console.log('No check-in location found for user');
+            return res.redirect('/login');
+        }
+
+        // Get gym information based on the gym ID
+        const gymInfo = await getGymInfo(currentGymId.location_id);
+        if (!gymInfo) {
+            console.log('Gym info not found');
+            return res.redirect('/login');
+        }
+
+        // Get the last payment details
+        const lastPayment = await getLastPayment(membership.membership_id);
+        if (!lastPayment) {
+        console.log('No payment information found for user');
+        }
+
+
+
+        // Render the page with all the necessary information
+        res.render('payhistory', { user, gymInfo,lastPayment});
+    } catch (err) {
+        console.error('Error in /payhistory route:', err);
+        res.status(500).send('An error occurred while processing your request.');
+    }
 });
+
 
 
 

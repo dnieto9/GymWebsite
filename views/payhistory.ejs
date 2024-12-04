@@ -76,15 +76,24 @@
                 <th>Status</th>
             </tr>
             <tr>
-                <td>01/10/2024</td>
-                <td>$50</td>
-                <td>Paid</td>
+                <td><%= lastPayment.most_recent_payment %></td>        
+                <td>Gold (needs to be logged in database)</td>
+                <td><%= lastPayment.membership_status %></td>
+        
+            </tr>
+            
+        </table>
+        <table border="1" cellpadding="10">
+            <tr>
+                <th>Location</th>
+                <th>Capacity</th>
+                <th>ManoMeter</th>
             </tr>
             <tr>
-                <td>15/10/2024</td>
-                <td>$50</td>
-                <td>Paid</td>
-            </tr>
+                <td><%= gymInfo.street %></td>
+                <td><%= gymInfo.capacity %></td>
+                <td>PlaceHolder for ManoMeter</td>
+            </tr>    
         </table>
         </div>
 </body>

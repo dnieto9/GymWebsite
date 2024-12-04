@@ -33,29 +33,22 @@ function passwordCheck(email,password, callback){
         callback(null, results.rows.length>0);
     });
 }
-function getUserByEmail(email, callback) {
-    let sql = "SELECT * FROM member WHERE email = $1";
-    client.query(sql, [email], (err, results) => {
-        if (err) {
-            console.log('Error in getUserByEmail:', err);
-            return callback(err); // Return error in the callback
-        }
 
-        if (results.rows.length > 0) {
-            // Return the user data (all columns) if found
-            return callback(null, results.rows[0]);  // Assuming you want the first result
-        } else {
-            return callback(null, null); // If no user is found
-        }
-    });
+
+async function getUserByEmail(email) {
+    const sql = "SELECT * FROM member WHERE email = $1";
+    try {
+        const results = await client.query(sql, [email]);
+        return results.rows.length > 0 ? results.rows[0] : null;
+    } catch (err) {
+        console.error('Error in getUserByEmail:', err);
+        throw err;
+    }
 }
 
 
 
 
-//functions that need direct access to database go here for example
-//userExists --> check if that username is already in the database 
-//passwordCheck --> makes sure password is valud
 //insert user --> insert a new user into the database
 //etc...
 

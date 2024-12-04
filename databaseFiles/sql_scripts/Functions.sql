@@ -59,13 +59,20 @@ BEGIN
     GROUP BY 
         loc.location_id
     ORDER BY 
-        male_percentage ASC
-    LIMIT 1;
+        male_percentage ASC --DESC
+    LIMIT 3;
 END;
 $$ LANGUAGE plpgsql;
 
 --Use of above fxn
-SELECT * FROM man_o_meter(); --outputs gym w least men
+SELECT * FROM man_o_meter(); --outputs 3 gyms w least men
+
+/*SELECT *
+FROM CheckIn c
+JOIN Member m ON c.user_id = m.membership_id
+WHERE c.location_id = 1 
+  AND m.gender = 'Male';*/
+
 
 -- function that automatically checks out member after 1 hour and 30 minutes
 CREATE OR REPLACE FUNCTION update_checkin_status()

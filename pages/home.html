@@ -59,6 +59,26 @@
             margin-bottom: 30px;
         }
 
+        /* Image Container Styling */
+        .image-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px; /* Spacing between images */
+            margin: 20px 0;
+        }
+
+        .side-image, .center-image {
+            max-width: 30%; /* Adjust width of images */
+            height: auto; /* Maintain aspect ratio */
+            border-radius: 10px; /* Optional: Rounded corners */
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Optional: Shadow */
+        }
+
+        .center-image {
+            max-width: 40%; /* Center image slightly larger */
+        }
+
         /* Button Styling */
         button {
             background-color: #ff69b4; /* Hot pink background */
@@ -83,7 +103,7 @@
 
         /* Admin Login Button */
         .admin-login-button {
-            background-color: #ff85c9; /* Lighter pink */
+            background-color:#ff69b4; /* matching pink */
             margin-top: 20px;
         }
     </style>
@@ -110,10 +130,19 @@
     <div class="container">
         <h1>Welcome to Our Gym!</h1>
         <p>Get fit, have fun, and stay healthy. Join us today!</p>
+        
         <button><a href="/signup">Sign Up</a></button>
         <button><a href="/login">Login</a></button>
+        
         <!-- Admin Login Button -->
         <button class="admin-login-button"><a href="/admin_login">Admin Login</a></button>
+
+        <!-- Image Container -->
+        <div class="image-container">
+           <!--- <img class="side-image" src="/images/weights.jpg" alt="Membership plans"> -->
+            <img class="center-image" src="/images/gymphoto.png" alt="Gym!">
+          <!--  <img class="side-image" src="/images/cardio.jpg" alt="Locations"> -->
+        </div>
     </div>
 </body>
 </html>

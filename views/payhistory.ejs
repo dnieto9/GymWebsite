@@ -76,10 +76,17 @@
                 <th>Status</th>
             </tr>
             <tr>
-                <td><%= lastPayment.most_recent_payment %></td>        
-                <td>Gold (needs to be logged in database)</td>
+                <td><%= lastPayment.most_recent_payment %></td>   
+                <td>
+                    <% if (user.membership_type === 1) { %>
+                        Gold
+                      <% } else if (user.membership_type === 2) { %>
+                        Silver
+                      <% } else if (user.membership_type === 3) { %>
+                        Bronze
+                      <% } %> 
+                </td>
                 <td><%= lastPayment.membership_status %></td>
-        
             </tr>
             
         </table>

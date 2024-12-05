@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Page</title>
+    <title>Manager Page</title>
     <style>
         /* General Styles */
         body {
@@ -124,6 +124,55 @@
             text-align: center;
             margin-top: 20px;
         }
+
+        /* css style for manager page*/
+        .add-manager-container {
+    margin-top: 40px;
+    padding: 20px;
+    background-color: #fff0f6;
+    border: 2px solid #ff4081;
+    border-radius: 15px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+.add-manager-container h2 {
+    color: #ff4081;
+    font-size: 1.8em;
+    margin-bottom: 20px;
+}
+
+.add-manager-container form label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 1.1em;
+}
+
+.add-manager-container form input {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ff4081;
+    border-radius: 10px;
+    font-size: 1em;
+}
+
+.add-manager-container form button {
+    padding: 10px 20px;
+    background-color: #ff4081;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.2em;
+    cursor: pointer;
+}
+
+.add-manager-container form button:hover {
+    background-color: #ff80ab;
+}
+
     </style>
 </head>
 <body>
@@ -139,8 +188,8 @@
 
         <!-- Navigation Options -->
         <div>
-            <a >Admin Home</a> | 
-            <a href="/manager_page">Manager Page</a> |
+            <a href="/admin_page">Admin Home</a> |
+            <a> Manager Page</a> |
             <a href="/location_page">Locations</a> |
             <a href="/logout"></a>
           <!-- Logout Link with Form -->
@@ -151,47 +200,41 @@
     <form id="logoutForm" action="/logout" method="POST" style="display: none;">
     </form>
 
-    <h1>Welcome to the Admin Page!</h1>
+    <h1>Welcome to the Manager Page!</h1>
 
     <!-- Search Section -->
     <div class="search-container">
-        <form action="/search" method="GET">
+        <form action="/search-manager" method="GET">
             <!-- Ensure searchTerm is correctly passed from the route -->
-            <input type="text" name="q" value="<%= searchTerm || '' %>" placeholder="Search members by name or ID" required>
+            <input type="text" name="q" value="<%= searchTerm || '' %>" placeholder="Search managers by name or ID" required>
             <button type="submit">Search</button>
         </form>
     </div>
 
     <!-- Results Section -->
     <div class="results-container">
-        <% if (members && members.length > 0) { %>
+        <% if (managers && managers.length > 0) { %>
             <table>
                 <thead>
                     <tr>
-                        <th>Membership ID</th>
+                        <th>Manager ID</th>
                         <th>First Name</th>
                         <th>Last Name</th>
-                        <th>Email</th>
                         <th>Phone Number</th>
-                        <th>Location Registered ID</th>
-                        <th>Check In</th>
+                        <th>Delete</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <% members.forEach(member => { %>
+                    <% managers.forEach(manager => { %>
                         <tr>
-                            <td><%= member.membership_id %></td>
-                            <td><%= member.first_name %></td>
-                            <td><%= member.last_name %></td>
-                            <td><%= member.email %></td>
-                            <td><%= member.phone_number %></td>
-                            <td><%= member.location_id %></td>
-
-
+                            <td><%= manager.manager_id %></td>
+                            <td><%= manager.first_name %></td>
+                            <td><%= manager.last_name %></td>
+                            <td><%= manager.phone_number %></td>
                             <td> 
-                                <form action="/checkin" method="POST">
-                                    <input type="hidden" name="membership_id" value="<%= member.membership_id %>" />
-                                    <button type="submit">Check In</button>
+                                <form action="/deleteManager" method="POST">
+                                    <input type="hidden" name="manager_id" value="<%= manager.manager_id %>" />
+                                    <button type="submit">Delete</button>
                                 </form>
 
                             </td>
@@ -200,8 +243,28 @@
                 </tbody>
             </table>
         <% } else { %>
-            <p class="no-results">No members found matching your search. Try again with different keywords!</p>
+            <p class="no-results">No managers found matching your search. Try again with different keywords!</p>
         <% } %>
     </div>
+    <div class="add-manager-container">
+        <h2>Add New Manager</h2>
+        <form action="/add-manager" method="POST">
+            <label for="first_name">First Name:</label>
+            <input type="text" id="first_name" name="first_name" required placeholder="Enter first name">
+            <br>
+    
+            <label for="last_name">Last Name:</label>
+            <input type="text" id="last_name" name="last_name" required placeholder="Enter last name">
+            <br>
+    
+            <label for="phone_number">Phone Number:</label>
+            <input type="text" id="phone_number" name="phone_number" required placeholder="Enter phone number">
+            <br>
+    
+            <button type="submit">Add Manager</button>
+        </form>
+    </div>
+    
+
 </body>
 </html>

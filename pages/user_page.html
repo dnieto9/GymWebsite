@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Page</title>
+    <link rel="stylesheet" type="text/css" href="/styles.css">
+    <style>
+        /* General Page Styling */
+        body {
+            background-color: #ffe4f3; /* Light pink background */
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            color: #ff69b4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navigation_bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff0f5;
+            padding: 10px 20px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            width: 90px;
+            height: auto;
+            border-radius: 50%;
+        }
+
+        .container {
+            padding: 50px;
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px #ffc0cb;
+        }
+
+        .gym-item {
+            background-color: #fff0f5;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .gym-item p {
+            margin: 5px 0;
+        }
+
+        .back-btn {
+            background-color: #ff69b4;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: white;
+        }
+
+        .back-btn:hover {
+            background-color: #ff85c9;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <div class="navigation_bar">
+        <a href="/" class="logo">
+            <img src="/images/logo.png" alt="Gym Logo">
+        </a>
+
+        <div>
+            <a href="/login">Login</a> | 
+            <a href="/signup">Sign Up</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <h1>Gyms with the Least Amount of Men</h1>
+
+        <!-- Dynamically display gyms with the least amount of men -->
+        <% gyms.forEach(gym => { %>
+            <div class="gym-item">
+                <p><strong>Location:</strong> <%= gym.street %>, <%= gym.city %>, <%= gym.state %>, <%= gym.zip %></p>
+                <p><strong>Male Percentage:</strong> <%= gym.male_percentage %>%</p>
+            </div>
+        <% }) %>
+
+        <!-- Button to go back to the home page -->
+        <a href="/" class="back-btn">Back to Home</a>
+    </div>
+
+</body>
+</html>

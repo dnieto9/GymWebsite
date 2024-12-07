@@ -79,6 +79,26 @@
             max-width: 40%; /* Center image slightly larger */
         }
 
+        /* Location List Scroll Styling */
+        .location-list {
+            max-height: 500px; /* Set a fixed height */
+            overflow-y: scroll; /* Enable vertical scrolling */
+            width: 30%; /* Same width as the center image */
+            padding: 10px;
+            border-radius: 10px;
+            background-color: #fff0f5; /* Soft pink background for the list */
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Optional: Shadow */
+        }
+
+        .location-item {
+            background-color: #ffb6c1;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            color: #fff;
+        }
+
         /* Button Styling */
         button {
             background-color: #ff69b4; /* Hot pink background */
@@ -137,11 +157,23 @@
         <!-- Admin Login Button -->
         <button class="admin-login-button"><a href="/admin_login">Admin Login</a></button>
 
-        <!-- Image Container -->
+
+        <!-- Image Container with Location List -->
         <div class="image-container">
-           <!--- <img class="side-image" src="/images/weights.jpg" alt="Membership plans"> -->
+            <!-- Scrolling Location List -->
+            <div class="location-list">
+                {% for location in locations %}
+                    <div class="location-item">
+                        <h3>{{ location.city }}</h3>
+                        <p>{{ location.street }}</p>
+                        <p>{{ location.state }}, {{ location.zip }}</p>
+                        <!-- <p>Capacity: {{ location.capacity }} members</p> -->
+                    </div>
+                {% endfor %}
+            </div>
             <img class="center-image" src="/images/gymphoto.png" alt="Gym!">
-          <!--  <img class="side-image" src="/images/cardio.jpg" alt="Locations"> -->
+    
+           <img class="side-image" src="/images/memberships.png" alt="memberships"> 
         </div>
     </div>
 </body>

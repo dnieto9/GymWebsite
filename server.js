@@ -65,6 +65,41 @@ app.get("/search", async (req, res) => {
     }
 });
 
+// Login route
+app.post("/login", async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        const query = "SELECT * FROM users WHERE email = $1 AND password = $2;";
+        const values = [email, password];
+        const result = await pool.query(query, values);
+
+        if (result.rows.length > 0) {
+            res.redirect("/user_page"); // Redirect on successful login
+        } else {
+            res.send("Invalid login credentials");
+        }
+    } catch (err) {
+        console.error("Error during login:", err.stack);
+        res.status(500).send("Error during login.");
+    }
+});
+
+// User Page Route
+app.get("/user_page", async (req, res) => {
+    try {
+        const query = "SELECT * FROM man_o_meter();";
+        const result = await pool.query(query);
+        const gyms = result.rows;
+
+        res.render("user_page", { gyms }); // Render user page with gym data
+    } catch (err) {
+        console.error("Error fetching gyms:", err.stack);
+        res.status(500).send("Error fetching gyms.");
+    }
+});
+
+
 // Start the server
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);

@@ -36,12 +36,14 @@ function memberLogin(req,res){
             console.log(email,'is logged in')
             admin = false;
             req.session.user = {email,admin};
-            return res.redirect("/payhistory");
+            return res.redirect("/user_page");
         }
         console.log('Mark 6');
     })
 
    
+
+    
 
 }
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employee Portal</title>
+    <title>Admin Login</title>
     <style>
         /* General Page Styling */
         body {
@@ -93,6 +93,18 @@
             background-color: #ff85c9;
             transform: scale(1.05);
         }
+        footer {
+    background-color: #ffe4f3;
+    padding: 20px;
+    text-align: center;
+    margin-top: 30px;
+    font-size: 1.2em;
+    color: #ff69b4; /* Matching pink text */
+}
+
+footer p {
+    margin: 0;
+}
     </style>
 </head>
 <body>
@@ -120,7 +132,7 @@
 
     <!-- Login Form -->
     <div class="login-container">
-        <h2>Admin Login</h2>
+        <h2>Employee Login</h2>
         <form action="/admin_login" method="POST">
             <input type="text" name="email" placeholder="Email" required><br>
             <input type="password" name="password" placeholder="Password" required><br>
@@ -128,4 +140,7 @@
         </form>
     </div>
 </body>
+<footer style="background-color: #ffe4f3; padding: 20px; text-align: center; margin-top: 30px;">
+    <p>© 2024 Fit Gals | Created by Dani, Natalie, and Daisy</p>
+</footer>
 </html>

@@ -4,6 +4,7 @@ var {memberLogin} = require('./databaseFiles/login');
 var {handleSignup} = require('./databaseFiles/signup'); 
 var{getUserByEmail} = require('./databaseFiles/database');
 var {getMembershipId,getCurrentGymId,getGymInfo,getLastPayment} = require('./databaseFiles/userFunctions');
+const moment = require('moment'); // Ensure moment is required at the top of your file
 
 var connection = require('./databaseFiles/database').databaseConnection;
 var fs = require("fs");
@@ -11,8 +12,22 @@ var fs = require("fs");
 
 //get home page 
 
-router.get('/', (req,res) =>{
-    res.render('home');
+router.get('/',async (req,res) =>{
+    try {
+        const query = `
+            SELECT *
+            FROM location;
+        `;
+
+        const result = await connection.query(query);
+        const locations = result.rows;
+
+        // Render the locations page with the locations data
+        res.render('home', { locations });
+    } catch (err) {
+        console.error('Error fetching locations:', err.message);  // Log error message
+        res.status(500).send('Error fetching locations.');
+    }
 })
 
 router.get('/login', (req,res) =>{
@@ -20,9 +35,27 @@ router.get('/login', (req,res) =>{
 })
 router.post('/login', memberLogin);
 
-router.get('/signup', (req,res) =>{
-    res.render('signup',{ error: null });
-})
+router.get('/signup', async (req, res) => {
+    try {
+        const query = `
+            SELECT 
+                location_id, 
+                CONCAT(location.street, ', ', location.city, ', ', location.state, ', ', location.zip) AS address
+            FROM location;
+        `;
+
+        const result = await connection.query(query);
+        const locations = result.rows;
+
+        // Render the locations page with the locations data
+        res.render('signup', { locations });
+    } catch (err) {
+        console.error('Error fetching locations:', err.message);  // Log error message
+        res.status(500).send('Error fetching locations.');
+    }
+});
+
+
 router.post('/signup', handleSignup);
 
 
@@ -257,8 +290,9 @@ router.post('/checkin', async (req, res) => {
 
 
 
-router.get('/payhistory', async (req, res) => {
-    console.log('session on /payhistory: ', req.session);
+
+router.get('/user_page', async (req, res) => {
+    console.log('session on /user_page: ', req.session);
 
     if (!req.session.user) {
         console.log('no session user');
@@ -288,7 +322,7 @@ router.get('/payhistory', async (req, res) => {
             console.log('No check-in location found for user');
             return res.redirect('/login');
         }
-
+        
         // Get gym information based on the gym ID
         const gymInfo = await getGymInfo(currentGymId.location_id);
         if (!gymInfo) {
@@ -296,21 +330,101 @@ router.get('/payhistory', async (req, res) => {
             return res.redirect('/login');
         }
 
+        var gymManometer = 0;
         // Get the last payment details
         const lastPayment = await getLastPayment(membership.membership_id);
         if (!lastPayment) {
-        console.log('No payment information found for user');
+            console.log('No payment information found for user');
         }
 
+        let gyms = [];
+        try {
+            const query = "SELECT * FROM man_o_meter();";
+            const result = await connection.query(query);
+            gyms = result.rows;
 
+            // Find the gym with the currentGymId
+            gymManometer = gyms.find(gym => gym.location_id === currentGymId.location_id)?.male_percentage || 0;
+
+        } catch (err) {
+            console.error("Error fetching gyms:", err.stack);
+            res.status(500).send("Error fetching gyms.");
+        }
+
+        // Format the dates
+        user.formatted_join_date = new Date(user.join_date).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+
+        lastPayment.formatted_most_recent = new Date(lastPayment.most_recent_payment).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+
+        // Ensure the most_recent_payment is a valid date string before parsing it
+        const lastPaymentDate = moment(lastPayment.most_recent_payment, 'YYYY-MM-DD');
+        
+        if (!lastPaymentDate.isValid()) {
+            console.error('Invalid last payment date:', lastPayment.most_recent_payment);
+            return res.status(400).send('Invalid payment date.');
+        }
+
+        // Calculate next payment date (1 month from the last payment date)
+        const nextPaymentDate = lastPaymentDate.add(1, 'months').format('YYYY-MM-DD');
 
         // Render the page with all the necessary information
-        res.render('payhistory', { user, gymInfo,lastPayment});
+        res.render('user_page', { 
+            user, 
+            gymInfo,
+            lastPayment,
+            gyms,
+            gymManometer,
+            nextPaymentDate // Pass the calculated next payment date
+        });
     } catch (err) {
-        console.error('Error in /payhistory route:', err);
+        console.error('Error in /user_page route:', err);
         res.status(500).send('An error occurred while processing your request.');
     }
 });
+
+
+router.post('/changeLocation', async (req, res) => {
+    const { location_id } = req.body;
+    const email = req.session.user?.email; // Retrieve the logged-in user's email
+
+    if (!email || !location_id) {
+        return res.status(400).send('User email or Location ID is missing!');
+    }
+
+    try {
+        // Fetch Membership_ID (user_id) using email
+        const userQuery = 'SELECT Membership_ID FROM Member WHERE Email = $1';
+        const userResult = await connection.query(userQuery, [email]);
+
+        if (userResult.rows.length === 0) {
+            return res.status(404).send('User not found!');
+        }
+
+        const user_id = userResult.rows[0].membership_id;
+
+        // Insert new check-in record
+        const checkInQuery = `
+            INSERT INTO CheckIn (user_id, location_id, status)
+            VALUES ($1, $2, 'checked_in')
+        `;
+        await connection.query(checkInQuery, [user_id, location_id]);
+
+        // Reload the page to reflect the updated location
+        return res.redirect('/user_page');
+    } catch (err) {
+        console.error('Error inserting check-in record:', err);
+        res.status(500).send('Failed to change location.');
+    }
+});
+
 
 //work on destroying user session
 // // Logout route to destroy the session

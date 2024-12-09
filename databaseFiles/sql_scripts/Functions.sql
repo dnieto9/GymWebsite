@@ -60,7 +60,7 @@ BEGIN
         loc.location_id
     ORDER BY 
         male_percentage ASC --DESC
-    LIMIT 3;
+   ; -- LIMIT 3;
 END;
 $$ LANGUAGE plpgsql;
 

@@ -10,7 +10,6 @@ function handleSignup(req, res) {
         gender,
         dob,
         join_date,
-        payment_status,
         email,
         phone_number,
         street,
@@ -18,52 +17,39 @@ function handleSignup(req, res) {
         state,
         zip,
         password,
-    } = req.body;  // Get data from the form submission
+        location_choice // Location ID from the dropdown
+    } = req.body;
 
-    // Basic validation: Check if all required fields are provided
+    // Validate required fields
     if (
-        !first_name || 
-        !last_name || 
-        !gender || 
-        !dob || 
-        !join_date || 
-        !payment_status || 
-        !email || 
-        !phone_number || 
-        !street || 
-        !city || 
-        !state || 
-        !zip || 
-        !password
+        !first_name || !last_name || !gender || !dob || !join_date ||
+        !email || !phone_number || !street || !city || !state || !zip || 
+        !password || !location_choice
     ) {
         return res.status(400).send('All fields are required!');
     }
 
-    // Convert 'payment_status' to a boolean value (true or false)
-    const paymentStatus = payment_status === 'paid';
-
-    // SQL query to insert the new member into the database (without the membership_id)
-    const query = `
+    // SQL query to insert the new member into the Member table
+    const insertMemberQuery = `
         INSERT INTO Member (
             First_name, Last_name, Gender, DOB, 
             Join_date, Payment_status, Email, Phone_number, 
-            Street, City, State, Zip, password
+            Street, City, State, Zip, password,membership_type
         ) 
         VALUES (
             $1, $2, $3, $4, 
-            $5, $6, $7, $8, 
-            $9, $10, $11, $12, $13
-       )
+            $5, TRUE, $6, $7, 
+            $8, $9, $10, $11, $12, 1
+        ) RETURNING Membership_ID
     `;
 
-    // Data to insert (without membership_id)
-    const values = [
+    // Data to insert for the Member table
+    const memberValues = [
         first_name,
         last_name,
         gender,
         dob,
         join_date,
-        paymentStatus,
         email,
         phone_number,
         street,
@@ -71,25 +57,52 @@ function handleSignup(req, res) {
         state,
         zip,
         password,
+
     ];
 
-    // Execute the query
-    connection.query(query, values)
-        .then((result) => {
-            const em = req.email;
-            // If the insert was successful, send a success response
-            admin = false;
-            req.session.user = {em,admin};
-            return res.redirect("/payhistory");
-            //res.status(201).send('Member registered successfully!');
+    // Insert the member and retrieve the Membership_ID
+    connection.query(insertMemberQuery, memberValues)
+        .then((memberResult) => {
+            const userId = memberResult.rows[0].membership_id;
+
+            // SQL query to insert the payment record
+            const insertPaymentQuery = `
+                INSERT INTO Payment (
+                    Member_ID, Most_recent_payment, Membership_status
+                )
+                VALUES ($1, CURRENT_DATE, 'Active')
+            `;
+
+            const paymentValues = [userId];
+
+            // Insert the payment record
+            return connection.query(insertPaymentQuery, paymentValues)
+                .then(() => {
+                    // SQL query to insert the check-in entry
+                    const insertCheckinQuery = `
+                        INSERT INTO CheckIn (
+                            user_id, location_id
+                        ) 
+                        VALUES ($1, $2)
+                    `;
+
+                    const checkinValues = [userId, location_choice];
+
+                    // Insert the check-in entry
+                    return connection.query(insertCheckinQuery, checkinValues)
+                        .then(() => {
+                            // Set the session and redirect to the user page
+                            req.session.user = { email, admin: false };
+                            return res.redirect("/user_page");
+                        });
+                });
         })
         .catch((err) => {
-            // Handle any errors
-            console.error('Error inserting member:', err);
-            return res.redirect("/signup");
-            //res.status(500).send('Error registering member!');
+            console.error('Error during signup or payment/check-in:', err);
+            return res.status(500).send('Error registering member!');
         });
 }
+
 
 
 

@@ -23,7 +23,7 @@ async function getMembershipId(email) {
 }
 
 async function getCurrentGymId(userId) {
-    const sql = "SELECT location_id FROM checkin WHERE user_id = $1 ORDER BY checkin_time DESC LIMIT 1"; // Assuming recent check-ins are relevant
+    const sql = "SELECT location_id FROM checkin WHERE user_id = $1 ORDER BY checkin_id DESC LIMIT 1"; // Ordering by checkin_id DESC to get the latest check-in
     try {
         const results = await client.query(sql, [userId]);
         return results.rows.length > 0 ? results.rows[0] : null;
@@ -32,6 +32,7 @@ async function getCurrentGymId(userId) {
         throw err;
     }
 }
+
 
 async function getGymInfo(locationId) {
     const sql = "SELECT * FROM location WHERE location_id = $1";

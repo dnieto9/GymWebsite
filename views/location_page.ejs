@@ -94,18 +94,63 @@
             text-align: center;
             margin-top: 20px;
         }
-        footer {
-    background-color: #ffe4f3;
-    padding: 20px;
-    text-align: center;
-    margin-top: 30px;
-    font-size: 1.2em;
-    color: #ff69b4; /* Matching pink text */
-}
 
-footer p {
-    margin: 0;
-}
+        /* Form Styling */
+        .new-location-form {
+            margin-top: 50px;
+            background-color: #fff0f5;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .new-location-form h2 {
+            text-align: center;
+            color: #ff4081;
+            margin-bottom: 20px;
+        }
+
+        .new-location-form label {
+            display: block;
+            margin: 10px 0 5px;
+            color: #ff4081;
+        }
+
+        .new-location-form input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ff4081;
+            border-radius: 5px;
+        }
+
+        .new-location-form button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #ff4081;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .new-location-form button:hover {
+            background-color: #ff80ab;
+        }
+
+        footer {
+            background-color: #ffe4f3;
+            padding: 20px;
+            text-align: center;
+            margin-top: 30px;
+            font-size: 1.2em;
+            color: #ff69b4;
+        }
+
+        footer p {
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -119,7 +164,6 @@ footer p {
 
         <div>
             <a href="/admin_page">Admin Home</a> |
-            <a href="/manager_page">Manager Page</a> |
             <a> Locations</a> |
             <a href="/logout"></a>
             <a href="#" onclick="document.getElementById('logoutForm').submit();">Logout</a>
@@ -150,7 +194,6 @@ footer p {
                             <td><%= location.capacity %></td>
                             <td><%= location.manager_name %></td>
                             <td><%= location.checked_in_count %></td>
-
                         </tr>
                     <% }) %>
                 </tbody>
@@ -159,8 +202,38 @@ footer p {
             <p class="no-results">No locations found.</p>
         <% } %>
     </div>
+
+    <!-- New Location Form -->
+    <div class="new-location-form">
+        <h2>Add New Location</h2>
+        <form action="/add_location" method="POST">
+            <label for="street">Street</label>
+            <input type="text" id="street" name="street" required>
+            <label for="city">City</label>
+            <input type="text" id="city" name="city" required>
+            <label for="state">State</label>
+            <input type="text" id="state" name="state" required>
+            <label for="zip">Zip</label>
+            <input type="text" id="zip" name="zip" required>
+
+            <label for="capacity">Capacity</label>
+            <input type="number" id="capacity" name="capacity" min="1" required>
+
+            <label for="manager-first-name">Manager First Name</label>
+            <input type="text" id="manager-first-name" name="manager_first_name" required>
+
+            <label for="manager-last-name">Manager Last Name</label>
+            <input type="text" id="manager-last-name" name="manager_last_name" required>
+
+            <label for="manager-phonenumber">Manager Phone Number</label>
+            <input type="text" id="manager-phonenumber" name="manager_phonenumber" required>
+
+            <button type="submit">Add Location</button>
+        </form>
+    </div>
+
+    <footer>
+        <p>© 2024 Fit Gals | Created by Dani, Natalie, and Daisy</p>
+    </footer>
 </body>
-<footer style="background-color: #ffe4f3; padding: 20px; text-align: center; margin-top: 30px;">
-    <p>© 2024 Fit Gals | Created by Dani, Natalie, and Daisy</p>
-</footer>
 </html>

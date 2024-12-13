@@ -99,7 +99,8 @@ function handleSignup(req, res) {
         })
         .catch((err) => {
             console.error('Error during signup or payment/check-in:', err);
-            return res.status(500).send('Error registering member!');
+            console.log(err);
+            return res.redirect('/signup');
         });
 }
 

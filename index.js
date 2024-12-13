@@ -130,27 +130,50 @@ router.get("/search-manager", async (req, res) => {
     }
 });
 
-router.post('/add-manager', async (req, res) => {
-    const { first_name, last_name, phone_number } = req.body;
+router.post('/add_location', async (req, res) => {
+    const {
+        street,
+        city,
+        state,
+        zip,
+        capacity,
+        manager_first_name,
+        manager_last_name,
+        manager_phonenumber,
+    } = req.body;
 
     try {
-        const query = `
+        // Insert the manager first and retrieve the ID
+        const managerQuery = `
             INSERT INTO manager (first_name, last_name, phone_number)
             VALUES ($1, $2, $3)
+            RETURNING manager_id;
+        `;
+        const managerValues = [manager_first_name, manager_last_name, manager_phonenumber];
+        const managerResult = await connection.query(managerQuery, managerValues);
+
+        const managerId = managerResult.rows[0].manager_id;
+        console.log('New manager added with ID:', managerId);
+
+        // Insert the location with the manager ID
+        const locationQuery = `
+            INSERT INTO location (street, city, state, zip, capacity, manager_id)
+            VALUES ($1, $2, $3, $4, $5, $6)
             RETURNING *;
         `;
-        const values = [first_name, last_name, phone_number];
-        const result = await connection.query(query, values);
+        const locationValues = [street, city, state, zip, capacity, managerId];
+        const locationResult = await connection.query(locationQuery, locationValues);
 
-        console.log('New manager added:', result.rows[0]);
+        console.log('New location added:', locationResult.rows[0]);
 
-        // Redirect back to the manager page
-        res.redirect('/manager_page');
+        // Redirect back to the locations page
+        res.redirect('/location_page');
     } catch (err) {
-        console.error('Error adding manager:', err.stack);
-        res.status(500).send('Error adding manager.');
+        console.error('Error adding location and manager:', err.stack);
+        res.status(500).send('Error adding location and manager.');
     }
 });
+
 router.post('/deleteManager', async (req, res) => {
     const { manager_id } = req.body;
 
@@ -390,6 +413,23 @@ router.get('/user_page', async (req, res) => {
     }
 });
 
+router.post('/update-user', (req, res) => {
+    const { phone_number, gender, membership_type, street, city, state, zip } = req.body;
+
+    // Update the user in the database
+    // Example: Update logic in PostgreSQL
+    connection.query(
+        'UPDATE member SET phone_number = $1, gender = $2, membership_type = $3, street = $4, city = $5, state = $6, zip = $7 WHERE email = $8',
+        [phone_number, gender, membership_type, street, city, state, zip, req.session.user?.email],
+        (err, result) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send('Error updating user');
+            }
+            res.redirect('/user_page');
+        }
+    );
+});
 
 router.post('/changeLocation', async (req, res) => {
     const { location_id } = req.body;

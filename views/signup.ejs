@@ -176,8 +176,26 @@ footer p {
             
             <div class="input-field">
                 <h2>Date of Birth</h2>
-                <input type="date" name="dob" placeholder="Enter your date of birth" required>
+                <input type="date" name="dob" id="dob" placeholder="Enter your date of birth" required>
             </div>
+            <script>
+                // Set the maximum allowable date to 18 years ago from today
+                const dobInput = document.getElementById('dob');
+                const today = new Date();
+            
+                // Calculate the maximum date (18 years ago)
+                const maxDate = new Date(
+                    today.getFullYear() - 18,
+                    today.getMonth(),
+                    today.getDate()
+                );
+            
+                // Format the date as YYYY-MM-DD
+                const formattedDate = maxDate.toISOString().split('T')[0];
+            
+                // Set the max attribute
+                dobInput.setAttribute('max', formattedDate);
+            </script>
 
             <div class="input-field">
                 <h2>Join Date</h2>

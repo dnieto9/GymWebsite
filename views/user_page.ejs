@@ -153,29 +153,115 @@ footer p {
 
  
 
-
-    <div class="container">
+    <form id="edit-form" action="/update-user" method="POST" class="container">
         <h1>Membership Information</h1>
-        <p>Welcome ! : <%= user.first_name %>, <%= user.last_name %></p>
-        <p>Phone Number : <%= user.phone_number %></p>
-        <p>Gender : <%= user.gender %></p>
-        <p>Member Plan : 
-            <% if (user.membership_type === 1) { %>
-                Bronze
-            <% } else if (user.membership_type === 2) { %>
-                Silver
-            <% } else if (user.membership_type === 3) { %>
-                Gold
-            <% } else { %>
-                Unknown
-            <% } %>
-         </p>        
-         <p>Date Joined : <%= user.formatted_join_date %></p>
-        <p>Address : <%= user.street %>, <%= user.city %>, <%= user.state %>, <%= user.zip %></p>
+        <p>Welcome! <%= user.first_name %>, <%= user.last_name %></p>
+        <p>Phone Number:
+            <span class="display-field" id="phone-display"><%= user.phone_number %></span>
+            <input class="edit-field" id="phone-edit" name="phone_number" type="text" value="<%= user.phone_number %>" style="display: none;">
+        </p>
+        <p>Gender:
+            <span class="display-field" id="gender-display"><%= user.gender %></span>
+            <select class="edit-field" id="gender-edit" name="gender" style="display: none;">
+                <option value="Male" <%= user.gender === 'Male' ? 'selected' : '' %>>Male</option>
+                <option value="Female" <%= user.gender === 'Female' ? 'selected' : '' %>>Female</option>
+                <option value="Non-binary" <%= user.gender === 'Other' ? 'selected' : '' %>>Non-binary</option>
+            </select>
+        </p>
+        <p>Member Plan:
+            <span class="display-field" id="membership-display">
+                <% if (user.membership_type === 1) { %>
+                    Bronze
+                <% } else if (user.membership_type === 2) { %>
+                    Silver
+                <% } else if (user.membership_type === 3) { %>
+                    Gold
+                <% } else { %>
+                    Unknown
+                <% } %>
+            </span>
+            <select class="edit-field" id="membership-edit" name="membership_type" style="display: none;">
+                <option value="1" <%= user.membership_type === 1 ? 'selected' : '' %>>Bronze</option>
+                <option value="2" <%= user.membership_type === 2 ? 'selected' : '' %>>Silver</option>
+                <option value="3" <%= user.membership_type === 3 ? 'selected' : '' %>>Gold</option>
+            </select>
+        </p>
+        <p>Address:
+            <span class="display-field" id="address-display"><%= user.street %>, <%= user.city %>, <%= user.state %>, <%= user.zip %></span>
+            <input class="edit-field" id="street-edit" name="street" type="text" value="<%= user.street %>" style="display: none;">
+            <input class="edit-field" id="city-edit" name="city" type="text" value="<%= user.city %>" style="display: none;">
+            <input class="edit-field" id="state-edit" name="state" type="text" value="<%= user.state %>" style="display: none;">
+            <input class="edit-field" id="zip-edit" name="zip" type="text" value="<%= user.zip %>" style="display: none;">
+        </p>
+    
+        <button id="edit-btn" class="back-btn" type="button">Edit</button>
+        <button id="save-btn" class="back-btn" type="submit" style="display: none;">Save</button>
+        <button id="exit-btn" class="back-btn" type="button" style="display: none;">Exit</button>
 
+    </form>
+    <script>
+       document.getElementById('edit-btn').addEventListener('click', function () {
+    const displayFields = document.querySelectorAll('.display-field');
+    const editFields = document.querySelectorAll('.edit-field');
 
+    displayFields.forEach(field => field.style.display = 'none');
+    editFields.forEach(field => field.style.display = 'block');
 
-    </div>
+    document.getElementById('edit-btn').style.display = 'none';
+    document.getElementById('save-btn').style.display = 'inline';
+    document.getElementById('exit-btn').style.display = 'inline';
+});
+
+document.getElementById('save-btn').addEventListener('click', function () {
+    const phoneValue = document.getElementById('phone-edit').value;
+    const genderValue = document.getElementById('gender-edit').value;
+    const membershipValue = document.getElementById('membership-edit').value;
+    const streetValue = document.getElementById('street-edit').value;
+    const cityValue = document.getElementById('city-edit').value;
+    const stateValue = document.getElementById('state-edit').value;
+    const zipValue = document.getElementById('zip-edit').value;
+
+    // Submit the updated data to the server using an AJAX call or a form submission
+    const updatedData = {
+        phone_number: phoneValue,
+        gender: genderValue,
+        membership_type: membershipValue,
+        street: streetValue,
+        city: cityValue,
+        state: stateValue,
+        zip: zipValue,
+    };
+
+    console.log(updatedData); // Replace with actual server submission logic
+
+    // Toggle back to display mode
+    const displayFields = document.querySelectorAll('.display-field');
+    const editFields = document.querySelectorAll('.edit-field');
+
+    displayFields.forEach(field => field.style.display = 'block');
+    editFields.forEach(field => field.style.display = 'none');
+
+    document.getElementById('edit-btn').style.display = 'inline';
+    document.getElementById('save-btn').style.display = 'none';
+    document.getElementById('exit-btn').style.display = 'none';
+});
+
+document.getElementById('exit-btn').addEventListener('click', function () {
+    const displayFields = document.querySelectorAll('.display-field');
+    const editFields = document.querySelectorAll('.edit-field');
+
+    // Revert to display mode without saving
+    displayFields.forEach(field => field.style.display = 'block');
+    editFields.forEach(field => field.style.display = 'none');
+
+    document.getElementById('edit-btn').style.display = 'inline';
+    document.getElementById('save-btn').style.display = 'none';
+    document.getElementById('exit-btn').style.display = 'none';
+});
+
+    </script>
+
+    
 
     <div class="container">
         <table border="1" cellpadding="10">
@@ -247,4 +333,6 @@ footer p {
 <footer style="background-color: #ffe4f3; padding: 20px; text-align: center; margin-top: 30px;">
     <p>© 2024 Fit Gals | Created by Dani, Natalie, and Daisy</p>
 </footer>
+
 </html>
+
